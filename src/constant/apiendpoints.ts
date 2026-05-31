@@ -1,6 +1,8 @@
   const apiEndPoints = {
   auth: {
-    login: '/user/login',
+    login: '/auth/login',
+    getprofile : '/auth/profile'
+
   },
 
   dashboard : {

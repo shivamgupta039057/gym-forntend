@@ -84,8 +84,9 @@ const validate = (values: AddMemberValues) => {
   if (!values.paidFees) errors.paidFees = 'Required';
   if (!values.weight) errors.weight = 'Required';
   if (!values.goal) errors.goal = 'Required';
-  if (!values.photo) errors.photo = 'Photo is required';
-  if (!values.aadhaarPhoto) errors.aadhaarPhoto = 'Aadhaar Card Photo is required';
+  // Remove photo and aadhaarPhoto as required fields
+  // if (!values.photo) errors.photo = 'Photo is required';
+  // if (!values.aadhaarPhoto) errors.aadhaarPhoto = 'Aadhaar Card Photo is required';
   return errors;
 };
 
@@ -429,9 +430,10 @@ const AddMembersModal: React.FC<ModalProps> = ({
                     <Typography variant="body2" sx={{ minHeight: 22 }}>
                       {values.photo ? values.photo.name : addPatientsId && addPatientsId.photoUrl ? "Existing photo loaded" : ''}
                     </Typography>
-                    {touched.photo && errors.photo && (
+                    {/* Do not show error for photo field */}
+                    {/* {touched.photo && errors.photo && (
                       <FormHelperText error>{errors.photo}</FormHelperText>
-                    )}
+                    )} */}
                   </Paper>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -473,9 +475,10 @@ const AddMembersModal: React.FC<ModalProps> = ({
                     <Typography variant="body2" sx={{ minHeight: 22 }}>
                       {values.aadhaarPhoto ? values.aadhaarPhoto.name : addPatientsId && addPatientsId.aadhaarPhotoUrl ? "Existing Aadhaar photo loaded" : ''}
                     </Typography>
-                    {touched.aadhaarPhoto && errors.aadhaarPhoto && (
+                    {/* Do not show error for aadhaarPhoto field */}
+                    {/* {touched.aadhaarPhoto && errors.aadhaarPhoto && (
                       <FormHelperText error>{errors.aadhaarPhoto}</FormHelperText>
-                    )}
+                    )} */}
                   </Paper>
                 </Grid>
 

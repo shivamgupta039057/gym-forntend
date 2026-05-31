@@ -58,9 +58,10 @@ export const Apiservice = {
             }
             return res;
         } catch (error) {
-            const err = error as AxiosError
-            toast.error(err.message)
-        }
+            const err = error as AxiosError;
+            toast.error(err.response?.data?.message ?? err.message);
+            return undefined;
+          }
     },
 
     postAuth: async (endpoint: string, body: Record<string, any>, token: string): Promise<AxiosResponse<ApiResponse> | undefined> => {

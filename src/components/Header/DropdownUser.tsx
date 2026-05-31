@@ -4,12 +4,19 @@ import UserOne from '../../images/user/user-01.png';
 import { useNavigate } from "react-router-dom";
 import localStorageKeys from '../../constant/localStorageKeys';
 import { ROUTES_CONST } from '../../constant/routeConstant';
+import apiEndPoints from '../../constant/apiendpoints';
+import { Apiservice } from '../../service/apiservice';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
+  const token = localStorage.getItem(localStorageKeys.token);
+  const [data, setData] = useState<any[]>({});
+
+  console.log("datadatadatadatadatadatadata" , data);
+  
 
   // close on click outside
   useEffect(() => {
@@ -37,7 +44,33 @@ const DropdownUser = () => {
     return () => document.removeEventListener('keydown', keyHandler);
   });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+
+  const getProfile = async () => {
+    try {
+      if (!token) {
+        throw new Error("Token is missing.")
+      }
+      let url = `${apiEndPoints.auth.getprofile}`
+
+      const res = await Apiservice.getAuth(url, token);
+
+      console.log("fdksjfdskdsklfdssl" , res);
+      
+      if (res && res.data.status === 200) {
+        setData(res.data.data);
+      } else {
+        setData([]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getProfile();
+  },[])
 
   return (
     <div className="relative">
@@ -49,9 +82,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {data.role}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">Super Admin</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
