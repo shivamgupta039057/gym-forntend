@@ -4,8 +4,8 @@ import toast from "react-hot-toast";
 // const baseurl: string = "http://159.89.164.11:7677/admin/v1"
 // const baseurl: string = "http://localhost:7777/api/v1"
 // export const imgBaseUrl : string = "http://localhost:7777"
-const baseurl: string = "https://gym-backend-rnfr.onrender.com/api/v1"
-export const imgBaseUrl : string = "https://gym-backend-rnfr.onrender.com"
+const baseurl: string = "https://gym-backend-q99z.onrender.com/api/v1"
+export const imgBaseUrl : string = "https://gym-backend-q99z.onrender.com"
 
 
 interface ApiResponse {
