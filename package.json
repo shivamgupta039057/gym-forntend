@@ -21,7 +21,7 @@
     "@mui/material": "^6.1.6",
     "@mui/system": "^6.1.6",
     "@mui/x-date-pickers": "^7.29.4",
-    "apexcharts": "^3.41.0",
+    "apexcharts": "^4.0.0",
     "axios": "^1.7.7",
     "flatpickr": "^4.6.13",
     "formik": "^2.4.6",
