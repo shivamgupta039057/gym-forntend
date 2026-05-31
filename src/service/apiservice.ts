@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 const baseurl: string = "https://gym-backend-q99z.onrender.com/api/v1"
 export const imgBaseUrl : string = "https://gym-backend-q99z.onrender.com"
 
-
+console.log("baseurl" , baseurl);
 interface ApiResponse {
     success: boolean;
     message: string;
