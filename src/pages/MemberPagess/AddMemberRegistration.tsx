@@ -41,6 +41,7 @@ interface ModalProps {
   addPatientsId?: any;
 }
 
+// Add date to AddMemberValues
 interface AddMemberValues {
   fullName: string;
   phone: string;
@@ -53,7 +54,18 @@ interface AddMemberValues {
   goal: string;
   photo: File | null;
   aadhaarPhoto: File | null;
+  date: string; // new field
 }
+
+// Today's date in yyyy-mm-dd format
+const getDefaultDate = () => {
+  const today = new Date();
+  // Pad month and date as 2-digit numbers
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 const initialValues: AddMemberValues = {
   fullName: '',
@@ -67,6 +79,7 @@ const initialValues: AddMemberValues = {
   goal: '',
   photo: null,
   aadhaarPhoto: null,
+  date: getDefaultDate(),
 };
 
 const validate = (values: AddMemberValues) => {
@@ -79,7 +92,7 @@ const validate = (values: AddMemberValues) => {
   }
   if (!values.age) errors.age = 'Required';
   if (!values.gender) errors.gender = 'Required';
-  if (!values.address) errors.address = 'Required';
+  // if (!values.address) errors.address = 'Required';
   if (!values.planId) errors.planId = 'Required';
   if (!values.paidFees) errors.paidFees = 'Required';
   if (!values.weight) errors.weight = 'Required';
@@ -87,6 +100,7 @@ const validate = (values: AddMemberValues) => {
   // Remove photo and aadhaarPhoto as required fields
   // if (!values.photo) errors.photo = 'Photo is required';
   // if (!values.aadhaarPhoto) errors.aadhaarPhoto = 'Aadhaar Card Photo is required';
+  if (!values.date) errors.date = 'Required';
   return errors;
 };
 
@@ -123,9 +137,10 @@ const AddMembersModal: React.FC<ModalProps> = ({
         goal: addPatientsId.goal || '',
         photo: null, // No File in edit
         aadhaarPhoto: null, // No File in edit
+        date: addPatientsId.date ? addPatientsId.date.split('T')[0] : getDefaultDate(), // prefer existing date if present
       };
     }
-    return initialValues;
+    return { ...initialValues };
   };
 
   const formInitialValues = useMemo(getInitialValues, [addPatientsId]);
@@ -171,6 +186,7 @@ const AddMembersModal: React.FC<ModalProps> = ({
       formData.append('paidFees', values.paidFees.toString());
       formData.append('weight', values.weight.toString());
       formData.append('goal', values.goal);
+      formData.append('joinDate', values.date); // add date field
 
       if (values.photo) {
         formData.append('photo', values.photo);
@@ -321,6 +337,23 @@ const AddMembersModal: React.FC<ModalProps> = ({
                     size="medium"
                   />
                 </Grid>
+                {/* New Date field as required */}
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Date"
+                    name="date"
+                    type="date"
+                    value={values.date}
+                    onChange={e => setFieldValue('date', e.target.value)}
+                    error={touched.date && Boolean(errors.date)}
+                    helperText={touched.date && errors.date ? errors.date : ''}
+                    fullWidth
+                    size="medium"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </Grid>
                 <Grid item xs={12} sm={6}>
                   <FormControl
                     fullWidth
@@ -391,7 +424,7 @@ const AddMembersModal: React.FC<ModalProps> = ({
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <Paper variant="outlined" sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 2 }}>
                     <Typography variant="subtitle1" fontWeight={500} sx={{ mb: 1 }}>
                       Member Photo
@@ -436,7 +469,7 @@ const AddMembersModal: React.FC<ModalProps> = ({
                     )} */}
                   </Paper>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <Paper variant="outlined" sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 2 }}>
                     <Typography variant="subtitle1" fontWeight={500} sx={{ mb: 1 }}>
                       Aadhaar Card Photo
