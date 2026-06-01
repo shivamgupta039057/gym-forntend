@@ -24,6 +24,10 @@ function formatDate(dateValue: string | Date | undefined | null): string {
   return `${day}/${month}/${year}`;
 }
 
+// Update this URL (absolute, public internet URL or base64) as per your HIT FIT GYM genuine stamp asset
+const STAMP_IMAGE_URL =
+  'https://res.cloudinary.com/dbkamrwb1/image/upload/v1780331032/gqjtdyckocr7bysrvqb5.png'; // Example image url: replace with real one
+
 // Generate Invoice HTML (react -> static html string)
 function generateInvoiceHTML(invoice) {
   const member = invoice?.memberId || {};
@@ -55,11 +59,28 @@ function generateInvoiceHTML(invoice) {
   .total-section td{font-weight:bold;}
   .notes{margin-top:30px;}
   .notes h3{margin-bottom:10px;}
-  .footer{margin-top:50px;display:flex;justify-content:space-between;}
-  .signature{text-align:center;}
+  .footer{margin-top:50px;display:flex;justify-content:space-between;position:relative;}
+  .signature{text-align:center;position:relative;}
   .signature .line{margin-top:60px;border-top:1px solid #000;width:220px;padding-top:5px;}
+  .stamp-genuine{
+    position:absolute;
+    left:50%;
+    top:10px;
+    transform: translate(-50%, 0) rotate(-8deg);
+    width:110px;
+    height:auto;
+    opacity:0.85;
+    z-index:2;
+    pointer-events:none;
+    user-select:none;
+    filter: drop-shadow(3px 4px 5px rgba(0,0,0,0.15));
+  }
   .contact{margin-top:40px;text-align:center;border-top:2px solid #ddd;padding-top:15px;color:#666;}
-  @media print{body{background:#fff;padding:0;}.invoice-container{box-shadow:none;border:none;}}
+  @media print{
+    body{background:#fff;padding:0;}
+    .invoice-container{box-shadow:none;border:none;}
+    .stamp-genuine{opacity:0.85;}
+  }
   </style>
   </head>
   <body>
@@ -71,7 +92,6 @@ function generateInvoiceHTML(invoice) {
           </div>
           <div class="invoice-details">
               <h2>INVOICE</h2>
-             
               <p><strong>Date:</strong> ${formatDate(invoice?.createdAt)}</p>
           </div>
       </div>
@@ -128,16 +148,18 @@ function generateInvoiceHTML(invoice) {
       </div>
       <div class="footer">
           <div class="signature">
-              <div class="line">Member Signature</div>
+
           </div>
-          <div class="signature">
+          <div class="signature" style="position: relative; min-height: 130px;">
+              <!-- HIT FIT GYM GENUINE STAMP -->
+              <img class="stamp-genuine" src="${STAMP_IMAGE_URL}" alt="Genuine Stamp" />
               <div class="line">Authorized Signature</div>
           </div>
       </div>
       <div class="contact">
           <h3>HIT FIT GYM</h3>
           <p>📞 +91 9057280563</p>
-          <p>📍 Your Gym Address Here</p>
+          <p>17, Amer Rd, Ganesh Colony, Jaipur, Rajasthan 302002</p>
           <p>✉️ info@hitfitgym.com</p>
       </div>
   </div>
@@ -188,10 +210,6 @@ const InvoiceView: React.FC = () => {
     fetchInvoice();
   }, [invoiceId, token]);
 
-  // Fake/optional: sample details for demonstration
-  // Remove or update logic for recurring fees like Admission Fee, etc as you wire in actual API
-
-  // If you get extra fields like lockerCharges, admissionFee, etc in invoiceData use them; else remove from the HTML template above
 
   const handleDownloadPDF = async () => {
     // For actual HTML to PDF: You must create a backend endpoint using html-pdf-node to convert HTML string to PDF.
