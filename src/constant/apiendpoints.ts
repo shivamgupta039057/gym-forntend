@@ -18,9 +18,8 @@
     change_status : "/members/change-status",
     delete : '/members/delete',
     update : '/members/edit',
-    payment_detials : '/payment'
-
-
+    payment_detials : '/payment',
+    all_members: '/members/getallmembers'
   },
 
   plan:{

@@ -20,6 +20,9 @@ import AddRenewModel from './AddRenewModel.js';
 import ChangeStatusModel from './ChangeStatusModel.js';
 import ViewProfileModel from './ViewProfile.js';
 
+// ADD XLSX FOR EXCEL EXPORT
+import * as XLSX from 'xlsx';
+
 // Custom styled components
 const Listbox = styled('ul')`
   font-size: 0.875rem;
@@ -91,8 +94,10 @@ const Members: React.FC = () => {
   const [showRenewModal, setShowRenewModal] = useState<boolean>(false);
   const [showChangeStatusModal, setShowChangeStatusModal] = useState<boolean>(false);
   const [ShowProfileModal, setShowProfileModal] = useState<boolean>(false);
-  
+
   const [planList, setPlanList] = useState<Array<{ _id: string, planName: string }>>([]);
+  const [planAllList, setPlanAllList] = useState<Array<any>>([]);
+
   const [filterPlanId, setFilterPlanId] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [filterPendingFees, setFilterPendingFees] = useState<string>('');
@@ -110,6 +115,19 @@ const Members: React.FC = () => {
         if (res?.data?.status === 200) setPlanList(res.data.data || []);
       } catch {
         setPlanList([]);
+      }
+    })();
+  }, [token]);
+
+  // Fetch all members for Excel export
+  useEffect(() => {
+    (async function () {
+      try {
+        if (!token) return;
+        const res = await Apiservice.getAuth(apiEndPoints.member.all_members, token);
+        if (res?.data?.status === 200) setPlanAllList(res.data.data || []);
+      } catch {
+        setPlanAllList([]);
       }
     })();
   }, [token]);
@@ -335,12 +353,43 @@ const Members: React.FC = () => {
     }
   };
 
+  // Helper function to export all member data in excel
+  const downloadAllMembersExcel = () => {
+    if (!Array.isArray(planAllList) || planAllList.length === 0) {
+      toast.error("No data available for download");
+      return;
+    }
+
+    // Prepare export data: flatten 'planId.planName'
+    const exportData = planAllList.map((item: any, idx: number) => ({
+      'No.': idx + 1,
+      'Full Name': item.fullName || 'N/A',
+      'Phone': item.phone || 'N/A',
+      'Age': item.age ?? 'N/A',
+      'Gender': item.gender || 'N/A',
+      'Address': item.address || 'N/A',
+      'Join': item.joinDate ? new Date(item.joinDate).toLocaleDateString() : 'N/A',
+      'Expire': item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : 'N/A',
+      'Plan': item.planId?.planName || 'N/A',
+      'Paid': item.paidFees ?? 'N/A',
+      'Pending': item.pendingFees ?? 'N/A',
+      'Weight': item.weight ?? 'N/A',
+      'Goal': item.goal || 'N/A',
+      'Status': item.status || 'N/A'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Members");
+    XLSX.writeFile(workbook, "all_members.xlsx");
+  };
+
   // Render
   return (
     <>
       <div className="flex justify-between items-start sm:items-center mb-6 gap-3 flex-col sm:flex-row">
         <Breadcrumb pageName="Members" />
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <button
             onClick={() => navigate(ROUTES_CONST.EXPIRED_MEMBERS)}
             className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-5 py-3 text-center font-medium text-white hover:bg-opacity-90"
@@ -361,12 +410,23 @@ const Members: React.FC = () => {
             <span><AddIcon /></span>
             Add Members
           </button>
+          {/* EXCEL DOWNLOAD BUTTON */}
+          <button
+            onClick={downloadAllMembersExcel}
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-5 py-3 text-center font-medium text-white hover:bg-opacity-90"
+            type="button"
+          >
+            <svg fill="none" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path d="M12 16V4m0 12l-4-4m4 4l4-4m4 8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4a0 0 0 0 1 0 0h16a0 0 0 0 1 0 0v4z" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Download Excel
+          </button>
         </div>
       </div>
 
       {/* Table filters */}
       <div className="flex flex-wrap items-end gap-4 mb-4">
-      <FormControl sx={{ minWidth: 140, mr: 2 }}>
+        <FormControl sx={{ minWidth: 140, mr: 2 }}>
           <InputLabel id="filter-status-label">Status</InputLabel>
           <Select
             labelId="filter-status-label"
@@ -382,7 +442,7 @@ const Members: React.FC = () => {
             <MenuItem value="left">Left</MenuItem>
           </Select>
         </FormControl>
-        
+
         <FormControl sx={{ minWidth: 140, mr: 2 }}>
           <InputLabel id="filter-plan-label">Plan</InputLabel>
           <Select
@@ -399,7 +459,7 @@ const Members: React.FC = () => {
             ))}
           </Select>
         </FormControl>
-        
+
         <FormControl sx={{ minWidth: 110, mr: 2 }}>
           <InputLabel id="filter-pending-label">Pending</InputLabel>
           <Select
@@ -415,6 +475,7 @@ const Members: React.FC = () => {
             <MenuItem value="false">False</MenuItem>
           </Select>
         </FormControl>
+
         <FormControl sx={{ minWidth: 120 }}>
           <InputLabel id="filter-expiring-label">Expiring</InputLabel>
           <Select
@@ -470,7 +531,7 @@ const Members: React.FC = () => {
         getFunction={fetchMembers}
         addPatientsId={selectedMemberObj}
       />
-       <ChangeStatusModel
+      <ChangeStatusModel
         openModal={showChangeStatusModal}
         setOpenAddModal={setShowChangeStatusModal}
         getFunction={fetchMembers}
